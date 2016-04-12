@@ -1,0 +1,39 @@
+{
+  "name": "Verge",
+  "version": "0.1.0",
+  "description": "The Basic VideoPlayer & lib",
+  "main": "dest/verge.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "set NODE_ENV=production&&node build",
+    "build:dev": "node build",
+    "prepublish": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vergeplayer/Verge.git"
+  },
+  "keywords": [
+    "Video",
+    "Player",
+    "HTML5"
+  ],
+  "author": "zhengzk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vergeplayer/Verge/issues"
+  },
+  "homepage": "https://github.com/vergeplayer/Verge#readme",
+  "peerDependencies": {
+    "vQ": "0.1.0"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^2.7.0",
+    "eslint-loader": "^1.3.0",
+    "jscs": "^2.11.0",
+    "jscs-loader": "^0.2.0",
+    "loader-utils": "^0.2.13",
+    "webpack": "^1.12.14"
+  }
+}

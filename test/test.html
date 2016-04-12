@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>verge Test</title>
+    <script type="text/javascript" src="../node_modules/vQ/build/vQ.min.js"></script>
+    <script type="text/javascript" src="../dest/verge.js"></script>
+</head>
+<body>
+    <div>
+        <video id="test" data-step="{}">
+            <!--<source src="http://7xssau.com2.z0.glb.clouddn.com/verge.mp4">-->
+            <!--<source src="http://7xssau.com2.z0.glb.clouddn.com/verge.ogv">-->
+            <!--<source src="http://7xssau.com2.z0.glb.clouddn.com/verge.webm">-->
+            <source src="assets/verge.mp4" type="video/mp4"/>
+            <source src="assets//verge.ogv" type="video/ogg"/>
+            <source src="assets//verge.webm" type="video/webm"/>
+            <p>
+                Not Supports HTML5 video
+            </p>
+        </video>
+    </div>
+    <div>
+        <button id="play">play</button>
+        <button id="pause">pause</button>
+        <button id="controls">controls</button>
+        <button id="fullscreen">fullscreen</button>
+    </div>
+
+    <script type="text/javascript">
+        var player = verge('#test', {
+            autoplay: false, /*将会传递至video*/
+            loop: false, /*将会传递至video*/
+            muted: false, /*将会传递至video*/
+            preload: false, /*将会传递至video*/
+            isWeixin: true,
+            attr: {
+                /*video 标签的其他自定义属性*/
+                key: 'value'
+            },
+            //src: 'http://7xng1b.com1.z0.glb.clouddn.com/mp4test.mp4',
+            controls: false,//是否展现controls
+            poster: 'http://r1.ykimg.com/05410408514A28096A0A417984A7F296'
+        });
+        player.bind(['onPlay','onPause'],function(e){
+             console.log(e.type,arguments);
+        });
+
+        vQ('#play').bind('click',function(){
+            player.play();
+        });
+        vQ('#pause').bind('click',function(){
+            player.pause();
+        });
+        vQ('#controls').bind('click',function(){
+            player.controls(!player.controls());
+        });
+        vQ('#fullscreen').bind('click',function(){
+            player.fullscreen(true);
+        });
+    </script>
+</body>
+</html>

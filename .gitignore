@@ -1,0 +1,14 @@
+# IntelliJ project files
+.idea
+*.iml
+
+# devDependencies
+node_modules
+
+# Backup File
+*.bak
+
+# Video File
+*.mp4
+*.ogv
+*.webm
