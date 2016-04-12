@@ -82,13 +82,6 @@ verge.extend({
         } else {
             throw new Error('The Device not support');
         }
-    },
-    /**
-     * 产生一个新的uid
-     * @returns {*|string}
-     */
-    guid:function(){
-        return utils.guid();
     }
 });
 

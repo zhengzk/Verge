@@ -39,30 +39,15 @@ var VideoPlayer = CoreObject.extend({
       throw new TypeError('The video not a video element');
       return;
     }
-    own.video = video;
-    own.options(own._initOptions(options));
-    own.bindEvents();
-  },
-  /**
-   * 获取options默认值
-   * @param options
-   * @returns {*|Map}
-   * @private
-   */
-  _initOptions: function (options) {
+    //设置默认值
     options = vQ.merge({
-      isWeixin: browser.isWeixin
+      isWeixin: browser.isWeixin,
+      controls: false
     }, options);
 
-    //不用merge处理 避免多余属性污染
-    var op = {
-      autoplay: options.autoplay || false, /*将会传递至video*/
-      loop: options.loop || false, /*将会传递至video*/
-      muted: options.muted || false, /*将会传递至video*/
-      preload: options.preload || false, /*将会传递至video*/
-      controls: options.controls || false
-    };
-    return vQ.merge(options, op);
+    own.video = video;
+    own.options(options);
+    own.bindEvents();
   },
   /**
    *设置or获取options
@@ -77,7 +62,7 @@ var VideoPlayer = CoreObject.extend({
         //设置options
         var op = {};
         vQ.each(arg, function (key, val) {
-          if (special.indexOf(arg + '-') < 0) {
+          if (special.indexOf(key + '-') < 0) {
             op[key] = val;
           }
         });
@@ -108,7 +93,7 @@ var VideoPlayer = CoreObject.extend({
             }
           }, this);
         }
-        own.options = vQ.merge(own.options || {}, arg);
+        own._options = vQ.merge(own._options || {}, arg);
       } else if (typeof arg == 'string') {
         //单个设值or取值
         if (arguments.length > 1) {
@@ -119,12 +104,12 @@ var VideoPlayer = CoreObject.extend({
         }
         //取值
         if (special.indexOf(arg + '-') >= 0) {
-          return own.options[arg];
+          return own._options[arg];
         }
         return own.attr(arg);
       }
     }
-    return own.options;
+    return own._options;
   },
   /**
    * 设置or获取当前时间方法
@@ -184,7 +169,7 @@ var VideoPlayer = CoreObject.extend({
    */
   src: function (src) {
     if (arguments.length > 0) {
-      var prepaused = !this.options.autoplay;
+      var prepaused = !this._options.autoplay;
       if (this.video.src) {
         prepaused = this.video.paused;
       }

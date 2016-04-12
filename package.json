@@ -1,6 +1,6 @@
 {
   "name": "Verge",
-  "version": "0.1.0",
+  "version": "0.0.2",
   "description": "The Basic VideoPlayer & lib",
   "main": "dest/verge.js",
   "scripts": {

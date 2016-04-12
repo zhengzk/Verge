@@ -1,4 +1,4 @@
-/*! Verge <0.1.0@2016-04-12T02:42Z> | Copyright (c) 2015-2016 1VERGE, Inc | Released under the MIT license | https://github.com/vergeplayer/Verge/blob/master/LICENSE */
+/*! Verge <0.1.0@2016-04-12T12:15Z> | Copyright (c) 2015-2016 1VERGE, Inc | Released under the MIT license | https://github.com/vergeplayer/Verge/blob/master/LICENSE */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -66,7 +66,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//var vQ = require('vQ');
 	if('function' !== typeof vQ || !vQ.fn || !vQ.extend){
-	    throw new TypeError('The Verge need The vQ : vergequery')
+	    throw new TypeError('The Verge need The vQ : npm install vQ --save');
 	}
 
 	// HTML5 Element Shim for IE8
@@ -79,7 +79,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var verge = __webpack_require__(1);
 	__webpack_require__(12);
 
+	var _verge = window['verge'];
+
 	verge.extend({
+	    utils:__webpack_require__(2),
 	    browser:__webpack_require__(3),
 	    playerApi:__webpack_require__(9),
 	    fullscreenApi:__webpack_require__(10),
@@ -88,7 +91,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    CoreObject:__webpack_require__(5),
 	    Event:__webpack_require__(13),
 	    EventManager:__webpack_require__(7),
-	    VideoPlayer:__webpack_require__(4)
+	    VideoPlayer:__webpack_require__(4),
+	    /**
+	     * 释放并返回vQ 解决命名冲突
+	     * @param flag
+	     * @returns {Function}
+	     */
+	    noConflict: function () {
+	        if (window['verge'] == verge) {
+	            window['verge'] = _verge;
+	        }
+	        return verge;
+	    }
 	});
 
 	module.exports = verge;
@@ -181,13 +195,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } else {
 	            throw new Error('The Device not support');
 	        }
-	    },
-	    /**
-	     * 产生一个新的uid
-	     * @returns {*|string}
-	     */
-	    guid:function(){
-	        return utils.guid();
 	    }
 	});
 
@@ -207,6 +214,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	 **/
 	var guid_prefix = new Date().getTime().toString(16).substring(4,10),
 	    guid_inx = 0;
+
+	/**
+	 *  补0 pad(1,2) ——> "01"
+	 * @param num
+	 * @param n
+	 * @returns {Array.<T>}
+	 */
+	function pad(num, n) {
+	    return (Array(n).join(0) + num).slice(-n)
+	}
 
 	var utils = {
 	    /**
@@ -231,16 +248,79 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	    guid:function(){
 	        return guid_prefix + "_" + guid_inx ++;
+	    },
+	    /**
+	     * 72 —> [01,12]
+	     * @param time
+	     * @returns {Array}
+	     */
+	    long2array: function (time) {
+	        var rs = [], t;
+	        var arr = [60, 1];
+	        if (time >= 3600) {
+	            arr = [3600, 60, 1];
+	        }
+	        arr.forEach(function (p) {
+	            rs.push(pad(t = (time / p) | 0, 2));
+	            time -= t * p
+	        });
+	        return rs;
+	    },
+	    /**
+	     * 格式化时间 72 —> 00:01:12
+	     * @param long
+	     * @returns {string}
+	     */
+	    long2time: function (long) {
+	        var rs = utils.long2array(long);
+	        return rs.join(':');
+	    },
+	    /**
+	     * long2text 72 —> 1分12秒
+	     * @param long
+	     * @returns {string}
+	     */
+	    long2text: function (long) {
+	        var ret = [];
+	        var arr = utils.long2array(long);
+	        var inx = 2;
+	        for (var i = arr.length - 1; i >= 0; i--) {
+	            var num = parseInt(arr[i]);
+	            ret.unshift(num + uint[unitIndex[inx]]);
+	            inx--;
+	        }
+	        return ret.join('');
+	    },
+	    /**
+	     * 将00:01:22的时间转换成 82
+	     * @param str
+	     * @returns {number}
+	     */
+	    time2long: function (str) {
+	        var arr = str.split(':');
+	        var r = 0;
+	        var len = arr.length;
+	        for (var k = len - 1; k >= 0; k--) {
+	            var t = parseInt(arr[k]);
+	            if (!isNaN(t)) {
+	                var w = len - k - 1;
+	                for (var i = 0; i < w; i++) {
+	                    t *= 60;
+	                }
+	                r += t;
+	            }
+	        }
+	        return r;
 	    }
 	};
 
-	///***
-	// * 拓展
-	// * @type {extend}
-	// */
-	//utils.extend = function() {
-	//    vQ.extend.apply(this, arguments);
-	//};
+	/***
+	 * 拓展
+	 * @type {extend}
+	 */
+	utils.extend = function() {
+	    vQ.extend.apply(this, arguments);
+	};
 
 	module.exports = utils;
 
@@ -438,30 +518,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      throw new TypeError('The video not a video element');
 	      return;
 	    }
-	    own.video = video;
-	    own.options(own._initOptions(options));
-	    own.bindEvents();
-	  },
-	  /**
-	   * 获取options默认值
-	   * @param options
-	   * @returns {*|Map}
-	   * @private
-	   */
-	  _initOptions: function (options) {
+	    //设置默认值
 	    options = vQ.merge({
-	      isWeixin: browser.isWeixin
+	      isWeixin: browser.isWeixin,
+	      controls: false
 	    }, options);
 
-	    //不用merge处理 避免多余属性污染
-	    var op = {
-	      autoplay: options.autoplay || false, /*将会传递至video*/
-	      loop: options.loop || false, /*将会传递至video*/
-	      muted: options.muted || false, /*将会传递至video*/
-	      preload: options.preload || false, /*将会传递至video*/
-	      controls: options.controls || false
-	    };
-	    return vQ.merge(options, op);
+	    own.video = video;
+	    own.options(options);
+	    own.bindEvents();
 	  },
 	  /**
 	   *设置or获取options
@@ -476,7 +541,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        //设置options
 	        var op = {};
 	        vQ.each(arg, function (key, val) {
-	          if (special.indexOf(arg + '-') < 0) {
+	          if (special.indexOf(key + '-') < 0) {
 	            op[key] = val;
 	          }
 	        });
@@ -507,7 +572,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	          }, this);
 	        }
-	        own.options = vQ.merge(own.options || {}, arg);
+	        own._options = vQ.merge(own._options || {}, arg);
 	      } else if (typeof arg == 'string') {
 	        //单个设值or取值
 	        if (arguments.length > 1) {
@@ -518,12 +583,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        //取值
 	        if (special.indexOf(arg + '-') >= 0) {
-	          return own.options[arg];
+	          return own._options[arg];
 	        }
 	        return own.attr(arg);
 	      }
 	    }
-	    return own.options;
+	    return own._options;
 	  },
 	  /**
 	   * 设置or获取当前时间方法
@@ -583,7 +648,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  src: function (src) {
 	    if (arguments.length > 0) {
-	      var prepaused = !this.options.autoplay;
+	      var prepaused = !this._options.autoplay;
 	      if (this.video.src) {
 	        prepaused = this.video.paused;
 	      }
